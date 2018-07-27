@@ -1,0 +1,9 @@
+build/
+node_modules/
+.idea/
+.DS_Store/
+coverage/
+coverage.json
+.vscode/
+coverageEnv/
+scTopics
