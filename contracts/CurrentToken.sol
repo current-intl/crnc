@@ -1,7 +1,9 @@
 pragma solidity ^0.4.24;
-
 import 'zeppelin-solidity/contracts/token/ERC20/PausableToken.sol';
 
+/// @title Current CRNC ERC20 Token
+/// @author Current Gibraltar 
+/// @notice This contract serves as the main Current token bearing entity
 contract CurrentToken is PausableToken {
 
     string constant public name = "Current";
@@ -14,6 +16,8 @@ contract CurrentToken is PausableToken {
     address public gibraltarAddress;
     address public distributorAddress;
 
+    /// @notice ctor with default token balances and non-contract owning Current
+    ///         token holding accounts
     constructor(
         uint256 _communityTokens,
         uint256 _presaleTokens,
@@ -23,26 +27,30 @@ contract CurrentToken is PausableToken {
         address _gibraltarAddress,
         address _distributorAddress
     ) public {
-        //Set initial token holding accounts, non-contract owning accounts
         communityAddress = _communityAddress;
         presaleAddress = _presaleAddress;
         gibraltarAddress = _gibraltarAddress;    
-        //create non-token holding distributor account, non-contract owning account
         distributorAddress = _distributorAddress;
 
-        //default initial token supply
         totalSupply_ = 1000000000000000000000000000;
 
         uint256 _initSupply = _communityTokens.add(_presaleTokens.add(_gibraltarTokens));
-        //verify token holding account distributions account for total token supply
+
         require(_initSupply == totalSupply_);
 
-        //completed initial token balance distributions
         balances[communityAddress] = _communityTokens;
         balances[presaleAddress] = _presaleTokens; 
         balances[gibraltarAddress] = _gibraltarTokens;
     }
 
+    /// @author Ryan Fisch
+    /// @notice Support for initial token distribution for multiple recipients in a single 
+    ///         transaction to try and reduce gas costs during token distributions.  This method is available to any token holders 
+    ///         to complete batch distributions to multiple recipients with varying distribution amounts.
+    /// @dev If the token senders account balance is depleted over the course of the batch transfer
+    ///      prior to exhausting the distribution list this call will revert.
+    /// @param _recipients List of recipient addresses
+    /// @param _distributions matching list of recipient amounts
     function batchTransfer(
         address[] _recipients,
         uint256[] _distributions
@@ -58,6 +66,10 @@ contract CurrentToken is PausableToken {
         }
     }
 
+    /// @author Ryan Fisch
+    /// @notice Setter to modify the max available batch size by owner only
+    /// @dev must be greater than 0, and can anticipate overflow on uint8 for values greater than 256
+    /// @param _maxBatchSize new max batch size between 1 and 255
     function setMaxBatchSize(uint8 _maxBatchSize) 
     public
     onlyOwner 
@@ -66,6 +78,11 @@ contract CurrentToken is PausableToken {
         maxBatchSize = _maxBatchSize;
     }
 
+    /// @author Ryan Fisch
+    /// @notice Whitelisted call to underlying batch transfer when the contract is in a paused state. Subject
+    ///         to all restrictions and limitations of the batch transfer method. 
+    /// @param _recipients List of recipient addresses
+    /// @param _distributions matching list of recipient amounts
     function batchTransferWhenPaused(
         address[] _recipients,
         uint256[] _distributions
