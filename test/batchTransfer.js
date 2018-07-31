@@ -21,8 +21,6 @@ contract('CurrentToken.batchTransfer', function([owner, investor, investor1, com
 	const presaleTokens = 350000000 * Math.pow(10, 18);
     const gibraltarTokens = 550000000 * Math.pow(10, 18);
     
-
-    
     const verifyBalance = async (address, expectedBalance) => {
         assert.equal(await tokenContract.balanceOf.call(address), expectedBalance, 'balance inquiry failed assertion');
     }
@@ -112,6 +110,19 @@ contract('CurrentToken.batchTransfer', function([owner, investor, investor1, com
             const amounts = [100000000000000000, 100000000000000000];
             await tokenContract.batchTransferWhenPaused(recipients, amounts, {from: presaleAddress});
             await verifyBalance(recipients[0], amounts[0]);
+            const isStillPaused = await tokenContract.paused();
+            assert.equal(isStillPaused, true);
+        });
+
+        it('Token remains paused after a processing on guard failure attempt on batch transfer', async () => {
+            try {
+                const recipients = [investor, investor1];
+                const amounts = [100000000000000000000000000, 100000000000000000000000000];
+                await tokenContract.batchTransferWhenPaused(recipients, amounts, {from: presaleAddress});
+                await verifyBalance(recipients[0], amounts[0]);
+            } catch (err) {
+                assert.exists(err);
+            }
             const isStillPaused = await tokenContract.paused();
             assert.equal(isStillPaused, true);
         });
@@ -219,9 +230,9 @@ contract('CurrentToken.batchTransfer', function([owner, investor, investor1, com
         })
 
         it('batchTransfer in excess of senders available balance reverts', async () => {
-                const recipients = [investor, investor1];
-                const amounts = [100000000000000000, 100000000000000000000000000];
-                await expectRevert(tokenContract.batchTransfer)(recipients, amounts, {from: distributorAddress});
+            const recipients = [investor, investor1];
+            const amounts = [100000000000000000, 100000000000000000000000000];
+            await expectRevert(tokenContract.batchTransfer)(recipients, amounts, {from: distributorAddress});
         })
 
         it('max number of transactions is between 49 and 130', async () => {
