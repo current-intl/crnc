@@ -85,7 +85,6 @@ contract('CurrentToken', ([owner, communityAddress, presaleAddress, gibraltarAdd
             await expectRevert(tokenContract.setMaxBatchSize)(0);
         });
     
-        //Note: alternative is use uint256 with a require guard
         it('Setting maxBatchSize greater than 255 passes with wrapping if value is not equal to zero', async () => {
             await tokenContract.setMaxBatchSize(257);
             assert.equal(await tokenContract.maxBatchSize(), 1);

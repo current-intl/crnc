@@ -2,7 +2,7 @@ pragma solidity ^0.4.24;
 import 'zeppelin-solidity/contracts/token/ERC20/PausableToken.sol';
 
 /// @title Current CRNC ERC20 Token
-/// @author Current Gibraltar 
+/// @author Current (Gibraltar) Limited 
 /// @notice This contract serves as the main Current token bearing entity
 contract CurrentToken is PausableToken {
 
@@ -43,7 +43,6 @@ contract CurrentToken is PausableToken {
         balances[gibraltarAddress] = _gibraltarTokens;
     }
 
-    /// @author Ryan Fisch
     /// @notice Support for initial token distribution for multiple recipients in a single 
     ///         transaction to try and reduce gas costs during token distributions.  This method is available to any token holders 
     ///         to complete batch distributions to multiple recipients with varying distribution amounts.
@@ -66,7 +65,6 @@ contract CurrentToken is PausableToken {
         }
     }
 
-    /// @author Ryan Fisch
     /// @notice Setter to modify the max available batch size by owner only
     /// @dev must be greater than 0, and can anticipate overflow on uint8 for values greater than 256
     /// @param _maxBatchSize new max batch size between 1 and 255
@@ -78,7 +76,6 @@ contract CurrentToken is PausableToken {
         maxBatchSize = _maxBatchSize;
     }
 
-    /// @author Ryan Fisch
     /// @notice Whitelisted call to underlying batch transfer when the contract is in a paused state. Subject
     ///         to all restrictions and limitations of the batch transfer method. 
     /// @param _recipients List of recipient addresses
