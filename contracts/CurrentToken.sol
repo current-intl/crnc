@@ -1,5 +1,5 @@
 pragma solidity ^0.4.24;
-import 'zeppelin-solidity/contracts/token/ERC20/PausableToken.sol';
+import './PausableToken.sol';
 
 /// @title Current CRNC ERC20 Token
 /// @author Current (Gibraltar) Limited 
@@ -9,7 +9,6 @@ contract CurrentToken is PausableToken {
     string constant public name = "Current";
     string constant public symbol = "CRNC";
     uint8 constant public decimals = 18;
-    uint8 public maxBatchSize = 50;
 
     address public communityAddress;
     address public presaleAddress;
@@ -25,8 +24,9 @@ contract CurrentToken is PausableToken {
         address _communityAddress,
         address _presaleAddress,
         address _gibraltarAddress,
-        address _distributorAddress
-    ) public {
+        address _distributorAddress,
+        address _pausableCustodian
+    ) PausableToken(_pausableCustodian) public {
         communityAddress = _communityAddress;
         presaleAddress = _presaleAddress;
         gibraltarAddress = _gibraltarAddress;    
@@ -58,22 +58,11 @@ contract CurrentToken is PausableToken {
     whenNotPaused 
     {
         require(_recipients.length == _distributions.length);
-        require(_recipients.length <= maxBatchSize);
+        require(_recipients.length <= 255);
 
         for (uint8 i = 0; i < _recipients.length; i++) {
             transfer(_recipients[i], _distributions[i]);
         }
-    }
-
-    /// @notice Setter to modify the max available batch size by owner only
-    /// @dev must be greater than 0, and can anticipate overflow on uint8 for values greater than 256
-    /// @param _maxBatchSize new max batch size between 1 and 255
-    function setMaxBatchSize(uint8 _maxBatchSize) 
-    public
-    onlyOwner 
-    {
-        require(_maxBatchSize > 0);
-        maxBatchSize = _maxBatchSize;
     }
 
     /// @notice Whitelisted call to underlying batch transfer when the contract is in a paused state. Subject
@@ -88,7 +77,7 @@ contract CurrentToken is PausableToken {
     whenPaused 
     {
         require(
-            msg.sender == communityAddress || msg.sender == gibraltarAddress || msg.sender == presaleAddress || msg.sender == distributorAddress
+            msg.sender == communityAddress || msg.sender == presaleAddress || msg.sender == distributorAddress
         );
 
         paused = false;

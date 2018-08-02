@@ -2,7 +2,7 @@
 const Token = artifacts.require('./CurrentToken.sol');
 const expectRevert = require('./exceptionUtil');
 
-contract('CurrentToken', ([owner, communityAddress, presaleAddress, gibraltarAddress, distributorAddress]) => {
+contract('CurrentToken', ([owner, communityAddress, presaleAddress, gibraltarAddress, distributorAddress, custodianAddress]) => {
 
     let tokenContract;
 
@@ -12,7 +12,7 @@ contract('CurrentToken', ([owner, communityAddress, presaleAddress, gibraltarAdd
     const totalSupply = 1000000000 * Math.pow(10, 18);
 
     beforeEach(async () => {
-        tokenContract = await Token.new(communityTokens, presaleTokens, gibraltarTokens, communityAddress, presaleAddress, gibraltarAddress, distributorAddress);
+        tokenContract = await Token.new(communityTokens, presaleTokens, gibraltarTokens, communityAddress, presaleAddress, gibraltarAddress, distributorAddress, custodianAddress);
     });
 
     describe('Verify Token Construction', () => {
@@ -74,25 +74,5 @@ contract('CurrentToken', ([owner, communityAddress, presaleAddress, gibraltarAdd
         it('incorrect supplies should revert contract deployment', async () => {
             await expectRevert(Token.new)(100000000, 700000000, 100000000, communityAddress, presaleAddress, gibraltarAddress, distributorAddress);
         })
-    })
- 
-    describe('Max Batch Size', ()=> {
-        it('Non-Owner attempting to set maxBatchSize Reverts', async () => {
-            await expectRevert(tokenContract.setMaxBatchSize)(2, {from:gibraltarAddress});
-        });
-    
-        it('Setting maxBatchSize to zero Reverts', async () => {
-            await expectRevert(tokenContract.setMaxBatchSize)(0);
-        });
-    
-        it('Setting maxBatchSize greater than 255 passes with wrapping if value is not equal to zero', async () => {
-            await tokenContract.setMaxBatchSize(257);
-            assert.equal(await tokenContract.maxBatchSize(), 1);
-        });
-
-        it('Owner setting maxBatchSize should yield Setter value', async () => {
-            await tokenContract.setMaxBatchSize(150);
-            assert.equal(await tokenContract.maxBatchSize(), 150);
-         });
     })
 });

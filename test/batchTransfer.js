@@ -4,15 +4,16 @@ const Token = artifacts.require('./CurrentToken.sol');
 const BigNumber = require('./bignumber.js');
 const expectRevert = require('./exceptionUtil');
 
-contract('CurrentToken.batchTransfer', function([owner, investor, investor1, communityAddress, presaleAddress, gibraltarAddress, distributorAddress, negativeTestAccount]) {
+contract('CurrentToken.batchTransfer', function([owner, investor, investor1, communityAddress, presaleAddress, gibraltarAddress, distributorAddress, custodianAddress, negativeTestAccount]) {
     console.log('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
-    console.log('investor: ' + investor);
-    console.log('investor1: ' + investor1);
-    console.log('communityAddress: ' + communityAddress);
-    console.log('presaleAddress: ' + presaleAddress);    
-    console.log('gibraltarAddress: ' + gibraltarAddress);
-    console.log('distributorAddress: ' + distributorAddress);
-    console.log('negativeTest: ' + negativeTestAccount)
+    console.log(`investor: ${investor}`);
+    console.log(`investor1: ${investor1}`);
+    console.log(`communityAddress: ${communityAddress}`);
+    console.log(`presaleAddress: ${presaleAddress}`);    
+    console.log(`gibraltarAddress: ${gibraltarAddress}`);
+    console.log(`distributorAddress: ${ distributorAddress}`);
+    console.log(`custodianAddress: ${custodianAddress}`)
+    console.log(`negativeTest: ${negativeTestAccount}`)
     console.log('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
 
     let tokenContract;
