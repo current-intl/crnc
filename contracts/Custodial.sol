@@ -1,6 +1,5 @@
 pragma solidity ^0.4.23;
 
-
 /**
  * @title Custodial
  * @dev The Custodial contract has an custodian address, and provides basic authorization control
@@ -16,15 +15,14 @@ contract Custodial {
     );
 
     /**
-    * @dev The Ownable constructor sets the original `owner` of the contract to the sender
-    * account.
+    * @param _custodian The address that will have rights to pause and unpause the implementing token
     */
-    constructor(address _custodianAddres) internal {
-        custodian = _custodianAddres;
+    constructor(address _custodian) internal {
+        custodian = _custodian;
     }
 
     /**
-    * @dev Throws if called by any account other than the owner.
+    * @dev Throws if called by any account other than the custodian.
     */
     modifier onlyCustodian() {
         require(msg.sender == custodian);
@@ -48,8 +46,8 @@ contract Custodial {
     }
 
     /**
-    * @dev Transfers control of the contract to a newOwner.
-    * @param _newCustodian The address to transfer ownership to.
+    * @dev Transfers control of the contract to a new custodian.
+    * @param _newCustodian The address to transfer custodianship to.
     */
     function _transferCustody(address _newCustodian) internal {
         require(_newCustodian != address(0));

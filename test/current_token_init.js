@@ -36,11 +36,6 @@ contract('CurrentToken', ([owner, communityAddress, presaleAddress, gibraltarAdd
             assert.equal(actual, 'Current', 'Token name is incorrect');
         })
     
-        it('Should verify default max batch size', async () => {
-            let actual = await tokenContract.maxBatchSize.call();
-            assert.equal(actual, 50, 'Default max batch size is incorrect');
-        })
-    
         it('Should verify an airdrop allocation address', async () => {
             let actual = await tokenContract.communityAddress.call();
             assert.equal(actual, communityAddress, 'communityTokens allocation address is incorrect')
