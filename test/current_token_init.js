@@ -2,7 +2,7 @@
 const Token = artifacts.require('./CurrentToken.sol');
 const expectRevert = require('./exceptionUtil');
 
-contract('CurrentToken', ([owner, communityAddress, presaleAddress, gibraltarAddress, distributorAddress, custodianAddress]) => {
+contract('CurrentToken', ([owner, communityAddress, presaleAddress, gibraltarAddress, distributorAddress, custodianAddress, testAddress]) => {
 
     let tokenContract;
 
@@ -15,6 +15,26 @@ contract('CurrentToken', ([owner, communityAddress, presaleAddress, gibraltarAdd
         tokenContract = await Token.new(communityTokens, presaleTokens, gibraltarTokens, communityAddress, presaleAddress, gibraltarAddress, distributorAddress, custodianAddress);
     });
 
+    describe('Custody', () => {
+        it('Contract Custodian should be 0x0 after relinquishing custody', async () => {
+            await tokenContract.renounceCustody({from: custodianAddress});
+            let actual = await tokenContract.custodian.call({from: custodianAddress});
+             assert.equal(actual, 0x0000000000000000000000000000000000000000);
+        });
+
+        it('Contract Custodian should be 0x0...1 after transfer of custody', async () => {
+            await tokenContract.transferCustody(testAddress,{from: custodianAddress});
+            let actual = await tokenContract.custodian.call({from: custodianAddress});
+            console.log(actual)
+             assert.equal(actual, testAddress);
+        });
+        //Test non-custodian can't complete custodian only actions
+        //test failres if custodian not provider
+        //put in a check that custodian can' tbe owner
+    });
+
+
+    //transferCustody
     describe('Verify Token Construction', () => {
         it('Should verify decimals', async () => {
             let actual = await tokenContract.decimals.call();
@@ -67,7 +87,7 @@ contract('CurrentToken', ([owner, communityAddress, presaleAddress, gibraltarAdd
         });
 
         it('incorrect supplies should revert contract deployment', async () => {
-            await expectRevert(Token.new)(100000000, 700000000, 100000000, communityAddress, presaleAddress, gibraltarAddress, distributorAddress);
+            await expectRevert(Token.new)(100000000, 700000000, 100000000, communityAddress, presaleAddress, gibraltarAddress, distributorAddress, custodianAddress);
         })
     })
 });
