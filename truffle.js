@@ -20,7 +20,7 @@ module.exports = {
       from: "0x8EadeD83C2137c43f7Ff277c69f02e34A40Dd835"
     },
     coverage: {
-      port: 8545,
+      port: 8555,
       host: "localhost",
       network_id: "*",
       gas: 0xffffffff, // <-- 4,000,000 high gas value

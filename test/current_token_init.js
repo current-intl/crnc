@@ -13,6 +13,7 @@ contract('CurrentToken', ([owner, communityAddress, presaleAddress, gibraltarAdd
 
     console.log('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
     console.log(`running ${__filename}`)
+    console.log(`Community Address: ${communityAddress}`)
     console.log(`Custodian Address: ${custodianAddress}`)
     console.log(`new Custodian Address: ${testAddress}`)
     console.log('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
@@ -110,26 +111,28 @@ contract('CurrentToken', ([owner, communityAddress, presaleAddress, gibraltarAdd
             if(await tokenContract.paused()){
                 await tokenContract.unpause({from: custodianAddress});
             }
-            assert.equal(false, await tokenContract.paused());
+            assert.isFalse(await tokenContract.paused())
         })
 
         it('transferFrom credits and debits correct amounts from source and target accounts', async () => {
+            await tokenContract.approve(presaleAddress, 10,  {from: communityAddress});
+            const trx = await tokenContract.transferFrom.sendTransaction(communityAddress, custodianAddress, 10, {from: presaleAddress});
+            assert.match(trx, /^0x([A-Fa-f0-9]{64})$/)
+        });
 
-            console.log(await tokenContract.paused())
-            const a1 = await tokenContract.balanceOf(communityAddress);
-            console.log(a1);
-            const b1 = await tokenContract.balanceOf(custodianAddress);
-            console.log(b1);
+        it('it completes approval with available spender balance', async () => {
+            const approvalComplete = await tokenContract.approve.sendTransaction(custodianAddress, 10, {from: communityAddress});
+            assert.match(approvalComplete, /^0x([A-Fa-f0-9]{64})$/)
+        })
 
-            const transferComplete = await tokenContract.transferFrom(communityAddress, custodianAddress, 10, {from: communityAddress});
-            assert.equal(transferComplete, true);
-            const a2 = await tokenContract.balanceOf(communityAddress);
-            console.log(a2);
-            const b2 = await tokenContract.balanceOf(custodianAddress);
-            console.log(b2);
+        it('it completes increaseApproval with available spender balance', async () => {
+            const approvalComplete = await tokenContract.increaseApproval.sendTransaction(custodianAddress, 10, {from: communityAddress});
+            assert.match(approvalComplete, /^0x([A-Fa-f0-9]{64})$/)
+        })
 
-            assert.equal(a2, a1 - 10);
-            assert.equal(b2, b1 + 10);
+        it('it completes decreaseApproval with available spender balance', async () => {
+            const approvalComplete = await tokenContract.decreaseApproval.sendTransaction(custodianAddress, 10, {from: communityAddress});
+            assert.match(approvalComplete, /^0x([A-Fa-f0-9]{64})$/)
         })
     })
 });

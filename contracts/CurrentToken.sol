@@ -1,5 +1,5 @@
 pragma solidity ^0.4.24;
-import './PausableToken.sol';
+import "./PausableToken.sol";
 
 /**
 * @title Current CRNC ERC20 Token
