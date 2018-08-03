@@ -30,7 +30,7 @@ contract Custodial {
     }
 
     /**
-    * @dev Allows the current custodian to relinquish control of the contract.
+    * @dev Allows the current custodian to relinquish custody of the contract.
     */
     function renounceCustody() public onlyCustodian {
         emit CustodyRenounced(custodian);
@@ -38,18 +38,10 @@ contract Custodial {
     }
 
     /**
-    * @dev Allows the current owner to transfer control of the contract to a newOwner.
-    * @param _newCustodian The address to transfer ownership to.
+    * @dev Allows the current owner to transfer control of the contract to a custodian.
+    * @param _newCustodian The address to transfer custody to.
     */
     function transferCustody(address _newCustodian) public onlyCustodian {
-        transferCustody(_newCustodian);
-    }
-
-    /**
-    * @dev Transfers control of the contract to a new custodian.
-    * @param _newCustodian The address to transfer custodianship to.
-    */
-    function _transferCustody(address _newCustodian) internal {
         require(_newCustodian != address(0));
         emit CustodyTransferred(custodian, _newCustodian);
         custodian = _newCustodian;

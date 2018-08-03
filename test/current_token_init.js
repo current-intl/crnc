@@ -11,30 +11,44 @@ contract('CurrentToken', ([owner, communityAddress, presaleAddress, gibraltarAdd
     const gibraltarTokens = 550000000 * Math.pow(10, 18);
     const totalSupply = 1000000000 * Math.pow(10, 18);
 
+    console.log('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
+    console.log(`running ${__filename}`)
+    console.log(`Custodian Address: ${custodianAddress}`)
+    console.log(`new Custodian Address: ${testAddress}`)
+    console.log('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
+
     beforeEach(async () => {
+
         tokenContract = await Token.new(communityTokens, presaleTokens, gibraltarTokens, communityAddress, presaleAddress, gibraltarAddress, distributorAddress, custodianAddress);
     });
 
     describe('Custody', () => {
         it('Contract Custodian should be 0x0 after relinquishing custody', async () => {
+     
             await tokenContract.renounceCustody({from: custodianAddress});
             let actual = await tokenContract.custodian.call({from: custodianAddress});
              assert.equal(actual, 0x0000000000000000000000000000000000000000);
         });
 
-        it('Contract Custodian should be 0x0...1 after transfer of custody', async () => {
-            await tokenContract.transferCustody(testAddress,{from: custodianAddress});
-            let actual = await tokenContract.custodian.call({from: custodianAddress});
-            console.log(actual)
-             assert.equal(actual, testAddress);
+        it('A non-custodial account cannot relinquish custody', async () => {
+            await expectRevert(tokenContract.renounceCustody)({from: testAddress});
         });
-        //Test non-custodian can't complete custodian only actions
-        //test failres if custodian not provider
-        //put in a check that custodian can' tbe owner
+
+        it('Contract Custodian should be 0x0...1 after transfer of custody', async () => {
+            await tokenContract.transferCustody('0xf6a948bff792e4f42d7f17e5e4ebe20871d160f2', {from: custodianAddress});
+            let actual = await tokenContract.custodian();
+            assert.equal(actual, '0xf6a948bff792e4f42d7f17e5e4ebe20871d160f2');
+        });
+
+        it('A non-custodial account cannot  transfer of custody', async () => {
+            await expectRevert(tokenContract.transferCustody)('0xf6a948bff792e4f42d7f17e5e4ebe20871d160f2', {from: testAddress});
+        });
+
+        it('Transferring custody to account 0x0 will revert', async () => {
+            await expectRevert(tokenContract.transferCustody)(0x0000000000000000000000000000000000000000, {from: custodianAddress})
+        });
     });
 
-
-    //transferCustody
     describe('Verify Token Construction', () => {
         it('Should verify decimals', async () => {
             let actual = await tokenContract.decimals.call();
@@ -88,6 +102,34 @@ contract('CurrentToken', ([owner, communityAddress, presaleAddress, gibraltarAdd
 
         it('incorrect supplies should revert contract deployment', async () => {
             await expectRevert(Token.new)(100000000, 700000000, 100000000, communityAddress, presaleAddress, gibraltarAddress, distributorAddress, custodianAddress);
+        })
+    })
+
+    describe('PausableToken', () => {
+        beforeEach(async () => {
+            if(await tokenContract.paused()){
+                await tokenContract.unpause({from: custodianAddress});
+            }
+            assert.equal(false, await tokenContract.paused());
+        })
+
+        it('transferFrom credits and debits correct amounts from source and target accounts', async () => {
+
+            console.log(await tokenContract.paused())
+            const a1 = await tokenContract.balanceOf(communityAddress);
+            console.log(a1);
+            const b1 = await tokenContract.balanceOf(custodianAddress);
+            console.log(b1);
+
+            const transferComplete = await tokenContract.transferFrom(communityAddress, custodianAddress, 10, {from: communityAddress});
+            assert.equal(transferComplete, true);
+            const a2 = await tokenContract.balanceOf(communityAddress);
+            console.log(a2);
+            const b2 = await tokenContract.balanceOf(custodianAddress);
+            console.log(b2);
+
+            assert.equal(a2, a1 - 10);
+            assert.equal(b2, b1 + 10);
         })
     })
 });
