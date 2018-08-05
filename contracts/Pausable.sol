@@ -1,4 +1,4 @@
-pragma solidity ^0.4.23;
+pragma solidity ^0.4.24;
 
 import "./Custodial.sol";
 
@@ -10,7 +10,7 @@ contract Pausable is Custodial {
     event Pause();
     event Unpause();
 
-    constructor (address _custodian) Custodial(_custodian) internal {}
+    constructor (address _custodian) internal Custodial(_custodian) {}
 
     bool public paused = false;
 
@@ -18,7 +18,7 @@ contract Pausable is Custodial {
     * @dev Modifier to make a function callable only when the contract is not paused.
     */
     modifier whenNotPaused() {
-        require(!paused);
+        require(!paused, "Expected paused to be false, but found true.");
         _;
     }
 
@@ -26,14 +26,14 @@ contract Pausable is Custodial {
     * @dev Modifier to make a function callable only when the contract is paused.
     */
     modifier whenPaused() {
-        require(paused);
+        require(paused, "Expected paused to be true, but found false");
         _;
     }
 
     /**
     * @dev called by the owner to pause, triggers stopped state
     */
-    function pause() onlyCustodian whenNotPaused public {
+    function pause() public onlyCustodian whenNotPaused {
         paused = true;
         emit Pause();
     }
@@ -41,7 +41,7 @@ contract Pausable is Custodial {
     /**
     * @dev called by the owner to unpause, returns to normal state
     */
-    function unpause() onlyCustodian whenPaused public {
+    function unpause() public onlyCustodian whenPaused {
         paused = false;
         emit Unpause();
     }

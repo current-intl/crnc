@@ -32,7 +32,7 @@ contract CurrentToken is PausableToken {
     * @param _presaleAddress address of token holding account for investor distributions
     * @param _gibraltarAddress address of token holding account for company owned tokens
     * @param _distributorAddress non-token holding account used for proxied transfers
-    * @param _pausableCustodianAddress non-token holding ustodial sterwardship of contract pausability
+    * @param _pausableCustodianAddress non-token holding contract pausability custodian
     */
     constructor(
         uint256 _communityTokens,
@@ -53,7 +53,7 @@ contract CurrentToken is PausableToken {
 
         uint256 _initSupply = _communityTokens.add(_presaleTokens.add(_gibraltarTokens));
 
-        require(_initSupply == totalSupply_);
+        require(_initSupply == totalSupply_, "Initialized token supply does not match total supply");
 
         balances[communityAddress] = _communityTokens;
         balances[presaleAddress] = _presaleTokens; 
@@ -76,9 +76,9 @@ contract CurrentToken is PausableToken {
     public 
     whenNotPaused 
     {
-        require(_recipients.length < 256 && _recipients.length == _distributions.length);
+        require(_recipients.length == _distributions.length, "Recipient and distribution arrays do not match");
 
-        for (uint8 i = 0; i < _recipients.length; i++) {
+        for (uint256 i = 0; i < _recipients.length; i++) {
             transfer(_recipients[i], _distributions[i]);
         }
     }
@@ -97,7 +97,8 @@ contract CurrentToken is PausableToken {
     whenPaused 
     {
         require(
-            msg.sender == communityAddress || msg.sender == presaleAddress || msg.sender == distributorAddress
+            msg.sender == communityAddress || msg.sender == presaleAddress || msg.sender == distributorAddress, 
+            "Attempting to batch transfer when contract is paused with a non-whitelisted account"
         );
 
         paused = false;

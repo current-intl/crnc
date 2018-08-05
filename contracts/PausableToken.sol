@@ -1,4 +1,4 @@
-pragma solidity ^0.4.23;
+pragma solidity ^0.4.24;
 
 import "zeppelin-solidity/contracts/token/ERC20/StandardToken.sol";
 import "./Pausable.sol";
@@ -9,7 +9,7 @@ import "./Pausable.sol";
  **/
 contract PausableToken is StandardToken, Pausable {
 
-    constructor(address _custodian) Pausable(_custodian) public { }
+    constructor(address _custodian) public Pausable(_custodian) { }
 
     function transfer(
         address _to,

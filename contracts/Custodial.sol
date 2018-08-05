@@ -1,9 +1,10 @@
-pragma solidity ^0.4.23;
+pragma solidity ^0.4.24;
 
 /**
  * @title Custodial
- * @dev The Custodial contract has an custodian address, and provides basic authorization control
- * functions, this simplifies the implementation of "user permissions".
+ * @dev The Custodial contract implements a permissionable construct to allow an address to have 
+ *      exclusive rights to an implementing contracts activites.  It is analogous to Ownable but requires
+ *      construtor settting as opposed to msg.sender assignment.
  */
 contract Custodial {
     address public custodian;
@@ -25,7 +26,7 @@ contract Custodial {
     * @dev Throws if called by any account other than the custodian.
     */
     modifier onlyCustodian() {
-        require(msg.sender == custodian);
+        require(msg.sender == custodian, "calling account is not a custodian");
         _;
     }
 
@@ -42,7 +43,7 @@ contract Custodial {
     * @param _newCustodian The address to transfer custody to.
     */
     function transferCustody(address _newCustodian) public onlyCustodian {
-        require(_newCustodian != address(0));
+        require(_newCustodian != address(0), "caller attempting to transfer custody to 0 account");
         emit CustodyTransferred(custodian, _newCustodian);
         custodian = _newCustodian;
     }
