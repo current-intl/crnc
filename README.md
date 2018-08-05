@@ -83,6 +83,23 @@ Make sure ganache-cli is running prior to execute solidity-covert or truffle tes
 
 For code coverage results run ./node_modules/.bin/solidity-coverage
 
+## Security Scanning
+Current conducts pre-audit security scans utilizing Mythril static analysis.  To replicate the security scan please use the following instructions:
+
+1. [Install](https://docs.docker.com/install/) Docker
+
+Since we will be testing a truffle based project...
+
+2. change your terminal to the root of downloaded git repository
+    ``` bash
+    cd ~/code/CRNC
+    ```
+3. run the following command: 
+    ```bash
+    $ docker run -v $(pwd):/tmp -w "/tmp/" mythril/myth --truffle
+    ```
+    The docker run will mount the docker containers /tmp directory to the terminal present working directory, and then set the container working directory to /tmp/ providing access to all of your *.sol code.
+
 ## Contracts on Etherscan
 Token address:
  [???](https://etherscan.io/)
