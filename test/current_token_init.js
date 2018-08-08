@@ -23,33 +23,6 @@ contract('CurrentToken', ([owner, communityAddress, presaleAddress, gibraltarAdd
         tokenContract = await Token.new(communityTokens, presaleTokens, gibraltarTokens, communityAddress, presaleAddress, gibraltarAddress, distributorAddress, custodianAddress);
     });
 
-    describe('Custody', () => {
-        it('Contract Custodian should be 0x0 after relinquishing custody', async () => {
-     
-            await tokenContract.renounceCustody({from: custodianAddress});
-            let actual = await tokenContract.custodian.call({from: custodianAddress});
-             assert.equal(actual, 0x0000000000000000000000000000000000000000);
-        });
-
-        it('A non-custodial account cannot relinquish custody', async () => {
-            await expectRevert(tokenContract.renounceCustody)({from: testAddress});
-        });
-
-        it('Contract Custodian should be 0x0...1 after transfer of custody', async () => {
-            await tokenContract.transferCustody('0xf6a948bff792e4f42d7f17e5e4ebe20871d160f2', {from: custodianAddress});
-            let actual = await tokenContract.custodian();
-            assert.equal(actual, '0xf6a948bff792e4f42d7f17e5e4ebe20871d160f2');
-        });
-
-        it('A non-custodial account cannot  transfer of custody', async () => {
-            await expectRevert(tokenContract.transferCustody)('0xf6a948bff792e4f42d7f17e5e4ebe20871d160f2', {from: testAddress});
-        });
-
-        it('Transferring custody to account 0x0 will revert', async () => {
-            await expectRevert(tokenContract.transferCustody)(0x0000000000000000000000000000000000000000, {from: custodianAddress})
-        });
-    });
-
     describe('Verify Token Construction', () => {
         it('Should verify decimals', async () => {
             let actual = await tokenContract.decimals.call();
@@ -103,36 +76,6 @@ contract('CurrentToken', ([owner, communityAddress, presaleAddress, gibraltarAdd
 
         it('incorrect supplies should revert contract deployment', async () => {
             await expectRevert(Token.new)(100000000, 700000000, 100000000, communityAddress, presaleAddress, gibraltarAddress, distributorAddress, custodianAddress);
-        })
-    })
-
-    describe('PausableToken', () => {
-        beforeEach(async () => {
-            if(await tokenContract.paused()){
-                await tokenContract.unpause({from: custodianAddress});
-            }
-            assert.isFalse(await tokenContract.paused())
-        })
-
-        it('transferFrom credits and debits correct amounts from source and target accounts', async () => {
-            await tokenContract.approve(presaleAddress, 10,  {from: communityAddress});
-            const trx = await tokenContract.transferFrom.sendTransaction(communityAddress, custodianAddress, 10, {from: presaleAddress});
-            assert.match(trx, /^0x([A-Fa-f0-9]{64})$/)
-        });
-
-        it('it completes approval with available spender balance', async () => {
-            const approvalComplete = await tokenContract.approve.sendTransaction(custodianAddress, 10, {from: communityAddress});
-            assert.match(approvalComplete, /^0x([A-Fa-f0-9]{64})$/)
-        })
-
-        it('it completes increaseApproval with available spender balance', async () => {
-            const approvalComplete = await tokenContract.increaseApproval.sendTransaction(custodianAddress, 10, {from: communityAddress});
-            assert.match(approvalComplete, /^0x([A-Fa-f0-9]{64})$/)
-        })
-
-        it('it completes decreaseApproval with available spender balance', async () => {
-            const approvalComplete = await tokenContract.decreaseApproval.sendTransaction(custodianAddress, 10, {from: communityAddress});
-            assert.match(approvalComplete, /^0x([A-Fa-f0-9]{64})$/)
         })
     })
 });
