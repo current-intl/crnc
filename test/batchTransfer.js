@@ -27,18 +27,6 @@ contract('CurrentToken.batchTransfer', function([owner, investor, investor1, com
         assert.equal(await tokenContract.balanceOf.call(address), expectedBalance, 'balance inquiry failed assertion');
     }
 
-    const testNdrops = async(n, last_recipient) =>{
-        const recipients = ['0x' + new BigNumber(last_recipient).plus(1).toString(16)];
-        const amounts = [100000000000000000000];
-
-        for (let i = 0; i < n-1; ++i) {
-            recipients.push('0x' + new BigNumber(recipients[i]).plus(1).toString(16));
-            amounts.push(100000000000000000000);
-        }
-        let tx = await tokenContract.batchTransfer(recipients, amounts, {from: distributorAddress});
-        return  tx.receipt.gasUsed;
-    };
-
     beforeEach(async () => {
         try {
             tokenContract = await Token.new(communityTokens, presaleTokens, gibraltarTokens, communityAddress, presaleAddress
@@ -54,16 +42,6 @@ contract('CurrentToken.batchTransfer', function([owner, investor, investor1, com
         beforeEach( async () => {
             await tokenContract.pause({from: custodianAddress});
         });
-
-        it('custodian should be able to unpause a paused contract', async () => {
-            await tokenContract.unpause({from: custodianAddress})
-            let isPaused = await tokenContract.paused();
-            assert.equal(isPaused, false)
-        })
-
-        it('non-custodian unpausing a paused contract should revert', async () => {
-            await expectRevert(tokenContract.unpause)({from: negativeTestAccount});
-        })
 
         it('distributorAddress batchTransfer() exception whenPaused', async () => {
             const recipients = [investor, investor1];
@@ -175,14 +153,6 @@ contract('CurrentToken.batchTransfer', function([owner, investor, investor1, com
             }
         });
 
-        it('custodian unpausing an unpaused contract should revert', async () => {
-           await expectRevert(tokenContract.unpause)({from: custodianAddress});
-        });
-    
-        it('non-custodian unpausing an unpaused contract should revert', async () => {
-            await expectRevert(tokenContract.unpause)({from: negativeTestAccount});
-        })
-
         it('batchTransferWhenPaused reverts whenNotPaused', async () => {
             const recipients = [investor, investor1];
             const amounts = [50000000, 50000000];
@@ -230,13 +200,11 @@ contract('CurrentToken.batchTransfer', function([owner, investor, investor1, com
         });
 
         it('Non-white-list accounts can batchTransfer() whenNotPaused', async () => {
-            //seed non white-list account with some tokens to transfer
             await tokenContract.transfer(negativeTestAccount, 1000000000000, {from: gibraltarAddress} )
-            //test
             const recipients = [investor, investor1];
             const amounts = [33333, 44444];
             await tokenContract.batchTransfer(recipients, amounts, {from: presaleAddress});
-            
+
             for(let i = 0; i < recipients.length; i++) {
                 await verifyBalance(recipients[i], amounts[i]);
              }
@@ -253,25 +221,5 @@ contract('CurrentToken.batchTransfer', function([owner, investor, investor1, com
             const amounts = [100000000000000000, 100000000000000000000000000];
             await expectRevert(tokenContract.batchTransfer)(recipients, amounts, {from: distributorAddress});
         })
-
-        // it('max number of transactions is between 49 and 130', async () => {
-        //     let lastTrxCount = 1;
-        //     try {
-        //         let last_recipient;
-        //         let last_gas_consumption = 0;
-        //         last_recipient = await testNdrops(1, '0x1000000000000000000000000000000000000000')
-
-        //         while(last_gas_consumption <= 0x3D0900) //4,000,000
-        //         { 
-        //             last_gas_consumption = await testNdrops(lastTrxCount, last_recipient);
-        //             lastTrxCount += 10;
-        //         }
-        //     } catch(err) {
-        //         console.log(err.message);
-        //         console.log(`Max transactions reached: ${lastTrxCount-1}`)
-        //         assert.isAbove(lastTrxCount, 1, 'Did not reach anticipated max transaction count')
-        //         assert.isBelow(lastTrxCount, 200, 'too many transactions reached')
-        //     }
-        // });
     });
 });
