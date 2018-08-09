@@ -16,14 +16,15 @@ module.exports = {
     live: {
       network_id: 1,
       host: "localhost",
-      port:8545,
+      port: 8545,
       from: "0x8EadeD83C2137c43f7Ff277c69f02e34A40Dd835"
+    },
+    coverage: {
+      port: 8555,
+      host: "localhost",
+      network_id: "*",
+      gas: 0xffffffff, // <-- 4,000,000 high gas value
+      gasPrice: 0x03     // <-- Use this low gas price
     }
-  }, coverage: {
-    host: "localhost",
-    network_id: "*",
-    port: 8545,         // <-- If you change this, also set the port option in .solcover.js.
-    gas: 0xfffffffffff, // <-- Use this high gas value
-    gasPrice: 0x01      // <-- Use this low gas price
   }
 };
