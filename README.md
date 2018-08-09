@@ -30,20 +30,13 @@ For more information about Truffle visit [http://truffleframework.com/docs/](htt
     function batchTransfer(
         address[] _recipients,
         uint256[] _distributions
-    ) public {
-        require(paused == false);
-        require(_recipients.length == _distributions.length);
-        require(_recipients.length <= maxBatchSize);
+    ) 
+    public 
+    whenNotPaused 
+    {
+        require(_recipients.length == _distributions.length, "Recipient and distribution arrays do not match");
 
-        uint256 totalDistributions;
-
-        for (uint8 idxDist = 0; idxDist < _distributions.length; idxDist++) {
-            totalDistributions = totalDistributions.add(_distributions[idxDist]);
-        }
-    
-        require(totalDistributions <= balances[msg.sender]);
-
-        for (uint8 i = 0; i < _recipients.length; i++) {
+        for (uint256 i = 0; i < _recipients.length; i++) {
             transfer(_recipients[i], _distributions[i]);
         }
     }
@@ -54,9 +47,14 @@ The **batchTransfer** method was added support the initial token distribution fo
     function batchTransferWhenPaused(
         address[] _recipients,
         uint256[] _distributions
-    ) public {
-        require(paused == true);
-        require(msg.sender == airdropAllocationAddress || msg.sender == presaleAllocationAddress || msg.sender == distributorAddress);
+    ) 
+    public
+    whenPaused 
+    {
+        require(
+            msg.sender == communityAddress || msg.sender == presaleAddress || msg.sender == distributorAddress, 
+            "Attempting to batch transfer when contract is paused with a non-whitelisted account"
+        );
 
         paused = false;
         batchTransfer(_recipients, _distributions);
@@ -66,16 +64,6 @@ The **batchTransfer** method was added support the initial token distribution fo
 
 ```
 The **batchTransferWhilePaused** is in place to allow Current Media the ability to distribute tokens from the initial balance holding accounts to investors, bounty and referral participants while the contract is initially paused as a regulatory requirement.  Current is committed to ensuring the CRNC tokens are used, sold and transferred responsibly and within the legal and compliance boundaries of governing authorities.
-
-```Javascript
-    function setMaxBatchSize(uint8 _maxBatchSize) public returns(uint8) {
-        require(msg.sender == owner);
-        require(maxBatchSize > 0 && maxBatchSize < 255);
-
-        maxBatchSize = _maxBatchSize;
-    }
-```
-To avoid creating batch transaction that become unattractive to the network by time or cost a hard limit is imposed on batch transfer sizes.  From time to time this batch size may need to be adjusted so the contract owner can increase / decrease based on network conditions.
 
 ## Testing
 
