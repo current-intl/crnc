@@ -9,8 +9,9 @@ module.exports = function(deployer, network, accounts) {
 	const presaleAddress = '0x2acb2fe21209aaf7e29fbb32cd0c80dadb116f9c';
 	const gibraltarAddress = '0x1dca0155060ef9c34b1c8bc1bdde747fa2bca0eb';
 	const distributorAddress = '0x978cc863F949e31f8cCC9BD544683bfA5f98d09c';
+	const custodianAddress = '0x978cc863F949e31f8cCC9BD544683bfA5f98d09d';
 
 	deployer.deploy(
-		Token, communityTokens, presaleTokens, gibraltarTokens, communityAddress, presaleAddress, gibraltarAddress, distributorAddress
+		Token, communityTokens, presaleTokens, gibraltarTokens, communityAddress, presaleAddress, gibraltarAddress, distributorAddress, custodianAddress
 	).catch(console.log);
 };
