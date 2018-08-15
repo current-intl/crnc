@@ -14,7 +14,7 @@ The CurrentToken is a derivative of the Open Zeppelin, [PausableToken](https://g
 The Pausable and PausableToken were ported to allow for a variant on the Pausable life cycle contract providing a mechanism for a non-contract owner to manage the paused state of the ERC20 token. In lieu of the Ownable implementation, a new Custodial contract has been created which allows a constructor based address assignment. All methods, modifiers and general functionality have been carried over from the original Open Zeppelin contracts with the applicable modifications and supporting test suit.
 
 ## Project description
-Current is an incentivized, blockchain-enabled streaming ecosystem that lets you choose how to stream and pay for your media.
+Current is a blockchain-enabled media network that rewards users for streaming media.
 
 ## Dependencies
 We use [Truffle](http://truffleframework.com/) to compile, test and deploy smart contracts.
@@ -30,9 +30,9 @@ For more information about Truffle visit [http://truffleframework.com/docs/](htt
     function batchTransfer(
         address[] _recipients,
         uint256[] _distributions
-    ) 
-    public 
-    whenNotPaused 
+    )
+    public
+    whenNotPaused
     {
         require(_recipients.length == _distributions.length, "Recipient and distribution arrays do not match");
 
@@ -47,12 +47,12 @@ The **batchTransfer** method was added support the initial token distribution fo
     function batchTransferWhenPaused(
         address[] _recipients,
         uint256[] _distributions
-    ) 
+    )
     public
-    whenPaused 
+    whenPaused
     {
         require(
-            msg.sender == communityAddress || msg.sender == presaleAddress || msg.sender == distributorAddress, 
+            msg.sender == communityAddress || msg.sender == presaleAddress || msg.sender == distributorAddress,
             "Attempting to batch transfer when contract is paused with a non-whitelisted account"
         );
 
@@ -63,7 +63,7 @@ The **batchTransfer** method was added support the initial token distribution fo
 }
 
 ```
-The **batchTransferWhilePaused** is in place to allow Current Media the ability to distribute tokens from the initial balance holding accounts to investors, bounty and referral participants while the contract is initially paused as a regulatory requirement.  Current is committed to ensuring the CRNC tokens are used, sold and transferred responsibly and within the legal and compliance boundaries of governing authorities.
+The **batchTransferWhilePaused** is in place to allow Current Media the ability to distribute tokens from the initial balance holding accounts to investors, bounty and referral participants while the contract is paused initially.  Current is committed to ensuring the CRNC tokens are used, sold and transferred responsibly and within the legal and compliance boundaries of governing authorities.
 
 ## Testing
 
@@ -82,7 +82,7 @@ Since we will be testing a truffle based project...
     ``` bash
     cd ~/code/CRNC
     ```
-3. run the following command: 
+3. run the following command:
     ```bash
     $ docker run -v $(pwd):/tmp -w "/tmp/" mythril/myth --truffle
     ```
@@ -95,7 +95,7 @@ Token address:
 ## Licensing
 MIT License
 
-Copyright (c) 2018 Current Media
+Copyright © 2018 Current (Gibraltar) Limited
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
