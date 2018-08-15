@@ -2,7 +2,7 @@ pragma solidity ^0.4.24;
 import "./PausableToken.sol";
 
 /**
-* @title Current CRNC ERC20 Token
+* @title CRNC Token
 * @author Current (Gibraltar) Limited 
 * @notice This contract serves as the Current (Gibraltar) Limited token
 * THE OFFER, SALE, AND ISSUANCE OF THE TOKENS HAS NOT BEEN REGISTERED OR QUALIFIED UNDER LAWS OF ANY JURISDICTION IN THE WORLD. 
