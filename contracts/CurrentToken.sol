@@ -1,8 +1,8 @@
-pragma solidity ^0.4.24;
+pragma solidity 0.4.24;
 import "./PausableToken.sol";
 
 /**
-* @title Current CRNC ERC20 Token
+* @title CRNC Token
 * @author Current (Gibraltar) Limited 
 * @notice This contract serves as the Current (Gibraltar) Limited token
 * THE OFFER, SALE, AND ISSUANCE OF THE TOKENS HAS NOT BEEN REGISTERED OR QUALIFIED UNDER LAWS OF ANY JURISDICTION IN THE WORLD. 
@@ -23,7 +23,7 @@ contract CurrentToken is PausableToken {
     address public presaleAddress;
     address public gibraltarAddress;
     address public distributorAddress;
-
+    
     /**
     * @param _communityTokens pre-mined token balance for community distribution
     * @param _presaleTokens pre-mined token balance for investor distribution
@@ -43,7 +43,13 @@ contract CurrentToken is PausableToken {
         address _gibraltarAddress,
         address _distributorAddress,
         address _pausableCustodianAddress
-    ) PausableToken(_pausableCustodianAddress) public {
+    ) public PausableToken(_pausableCustodianAddress) {      
+        
+        require(_communityAddress != 0x0 && _presaleAddress != 0x0 && _gibraltarAddress != 0x0  
+            && _distributorAddress != 0x0 && _pausableCustodianAddress != 0x0, "0x0 address found in initialization");
+
+        require(_distributorAddress != _pausableCustodianAddress, "distributor can not be custodian");
+
         communityAddress = _communityAddress;
         presaleAddress = _presaleAddress;
         gibraltarAddress = _gibraltarAddress;    
@@ -51,13 +57,12 @@ contract CurrentToken is PausableToken {
 
         totalSupply_ = 1000000000000000000000000000;
 
-        uint256 _initSupply = _communityTokens.add(_presaleTokens.add(_gibraltarTokens));
-
-        require(_initSupply == totalSupply_, "Initialized token supply does not match total supply");
-
         balances[communityAddress] = _communityTokens;
         balances[presaleAddress] = _presaleTokens; 
         balances[gibraltarAddress] = _gibraltarTokens;
+
+        require(balances[communityAddress] + balances[presaleAddress] + balances[gibraltarAddress] == totalSupply_, "invalid total supply");
+        require((balances[_distributorAddress] + balances[_pausableCustodianAddress]) == 0, "non token bearing account has tokens");
     }
 
     /**

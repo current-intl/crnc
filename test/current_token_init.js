@@ -23,7 +23,7 @@ contract('CurrentToken', ([owner, communityAddress, presaleAddress, gibraltarAdd
         tokenContract = await Token.new(communityTokens, presaleTokens, gibraltarTokens, communityAddress, presaleAddress, gibraltarAddress, distributorAddress, custodianAddress);
     });
 
-    describe('Verify Token Construction', () => {
+    describe('Verify Token Construction', () => {        
         it('Should verify decimals', async () => {
             let actual = await tokenContract.decimals.call();
             assert.equal(actual, 18, 'Decimals do not match');
